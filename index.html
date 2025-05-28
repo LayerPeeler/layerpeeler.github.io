@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B9N9911MNC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-B9N9911MNC');
+  </script>
+  
+  <meta charset="utf-8">
+  <meta name="description"
+        content="LayerPeeler: Autoregressive Peeling for Layer-wise Image Vectorization">
+  <meta name="keywords" content="Clipart Animation, Text-to-Video Diffusion, Score Distillation Sampling, As-Rigid-As-Possible Shape Deformation">
+  <meta name="viewport" content="width=device-width, initial-scale=0.1">
+  <title>LayerPeeler: Autoregressive Peeling for Layer-wise Image Vectorization</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-tooltip.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<!--Title block-->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop" id="top">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">LayerPeeler: Autoregressive Peeling for Layer-wise Image Vectorization</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><a href="https://kingnobro.github.io/" target="_blank">Ronghuan Wu</a><sup>1</sup>,</span>
+            <span class="author-block"><a href="https://ansire.github.io/" target="_blank">Wanchao Su</a><sup>2</sup>,</span>
+            <span class="author-block"><a href="https://www.cityu.edu.hk/stfprofile/jingliao.htm" target="_blank">Jing Liao</a><sup>1</sup></span>
+          </div>
+          <div class="is-size-6 publication-authors">
+            <span class="author-block"><sup>1</sup>City University of Hong Kong, <sup>2</sup>Monash University</span> 
+          </div>
+          <br>
+          <!-- <div class="is-size-4 publication-authors">
+            <span class="author-block">International Journal of Computer Vision (IJCV)</span> 
+          </div> -->
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2404.12347" target="_blank"
+                  class="external-link button is-normal is-rounded">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+            
+
+              <span class="link-block">
+                <a href target="_blank"
+                class="external-link button is-normal is-rounded cursor-not-allowed pointer-events-none is-light">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>Code</span>
+              </a>
+              </span>
+           
+            </div>
+          </div>
+
+
+          <div class="columns is-centered has-text-centered is-variable is-8">
+          <div class="column is-three-quarters is-centered has-text-centered">
+            <div class="publication-links ">
+
+            <span class="link-block">
+              <a href="#gallery"
+                  class="nav-link button-55 is-normal">
+                <span>Gallery</span>
+                </a>
+            </span>
+
+            <span class="link-block">
+              <a href="#varying"
+                 class="nav-link button-55 is-normal">
+                <span>Varying the Style</span>
+                </a>
+            </span>
+
+          </div>
+
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-one-fifths has-text-centered">
+          <img id="style-image" src="static/images/method/teaser.jpg" />
+      </div>
+  </div>
+</section>
+
+<!--Video-->
+<!-- <section class="section hero is-light">
+  <div class="container is-max-desktop">
+    
+        <div class="item">
+          <p style="margin-bottom: 30px">
+        <video poster="" id="tree" autoplay controls muted loop height="100%">
+          <source src="static/videos/main_video/video_sketch_new.mp4"
+          type="video/mp4">
+
+        </video>
+        <h6 class="caption">We recommend watching the video with sound on</h6>
+        </p>
+      </div>
+  </div>
+</section> -->
+
+<!-- Abstract. -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+        <p>
+          Image vectorization is a powerful technique that converts raster images into vector graphics, enabling enhanced flexibility and interactivity. However, popular image vectorization tools struggle with occluded regions, producing incomplete or fragmented shapes that hinder editability. While recent advancements have explored rule-based and data-driven layer-wise image vectorization, these methods face limitations in vectorization quality and flexibility.
+          <br>
+          In this paper, we introduce LayerPeeler, a novel layer-wise image vectorization approach that addresses these challenges through a progressive simplification paradigm. The key to LayerPeeler's success lies in its <b>autoregressive peeling strategy</b>: by identifying and removing the topmost non-occluded layers while recovering underlying content, we generate vector graphics with complete paths and coherent layer structures. Our method leverages vision-language models to construct a layer graph that captures occlusion relationships among elements, enabling precise detection and description for non-occluded layers. These descriptive captions are used as editing instructions for a finetuned image diffusion model to remove the identified layers. To ensure accurate removal, we employ localized attention control that precisely guides the model to target regions while faithfully preserving the surrounding content. To support this, we contribute a large-scale dataset specifically designed for layer peeling tasks. Extensive quantitative and qualitative experiments demonstrate that LayerPeeler significantly outperforms existing techniques, producing vectorization results with superior path semantics, geometric regularity, and visual fidelity.
+        </p>
+        </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="section-title has-text-centered is-centered">
+      <h2 class="title is-3">How does it work?</h2><br>
+    </div>
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-one-fifths has-text-centered">
+          <img id="network" src="static/images/method/pipeline.jpg" />
+          <div class="content has-text-justified">
+              <br>
+              Given a rasterized source image (parrot), our system leverages vision-language models to analyze the image across three dimensions:
+              <br>
+              (1) constructing a <b>layer graph</b> that captures occlusion relationships among color regions,
+              <br>
+              (2) identifying the topmost layers and generating a <b>global prompt</b> that describes them,
+              <br>
+              (3) decomposing the topmost layers into <b>instance-level elements</b>, each with an associated prompt and bounding box.
+              <br>
+              The prompts and source image are encoded through text and image encoders to obtain $c_e$ and $x_\mathrm{src}$, respectively, while a noise vector $z_T$ is initialized. These inputs are fed into our <b>LoRA-finetuned diffusion model</b>, which synthesizes an image with the specified layers removed.
+              <br>
+              The bounding boxes guide <b>attention masks</b> within joint attention modules.
+              <br>
+              This layer removal process operates autoregressively, iteratively identifying and removing topmost layers until a complete layer-wise decomposition is achieved.
+          </div>
+      </div>
+  </div>
+</section>
+
+<!--Gallery-->
+<section class="section">
+  <div class="container is-widescreen" id="gallery">
+    <div class="link-block ">
+      <a href="#top"
+          class="nav-link button-55 is-normal">
+        <span>Go to Top</span>
+        </a>
+    </div>
+    <div class="section-title has-text-centered is-centered">
+      <h2 class="title is-3">Gallery</h2>
+    </div>
+    <div class="section is-centered has-text-centered">
+      Each grid shows the <b>source image</b> (top left) and each path in the <b>vectorized image</b> (bottom right).
+      <br>
+      These gifs show that each path is regular and complete.
+    </div>
+    <div class="container is-max-desktop is-centered has-text-centered">
+      <div class="gallery">
+
+        <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/302555.png" alt="302555"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/302555.gif" alt="302555"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/302777.png" alt="302777"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/302777.gif" alt="302777"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/303734.png" alt="303734"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/303734.gif" alt="303734"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/311577.png" alt="311577"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/311577.gif" alt="311577"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/311647.png" alt="311647"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/311647.gif" alt="311647"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/313195.png" alt="313195"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/313195.gif" alt="313195"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/314975.png" alt="314975"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/314975.gif" alt="314975"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/317068.png" alt="317068"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/317068.gif" alt="317068"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/317398.png" alt="317398"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/317398.gif" alt="317398"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/317411.png" alt="317411"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/317411.gif" alt="317411"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/318518.png" alt="318518"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/318518.gif" alt="318518"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/324001.png" alt="324001"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/324001.gif" alt="324001"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/324014.png" alt="324014"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/324014.gif" alt="324014"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/325796.png" alt="325796"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/325796.gif" alt="325796"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/341545.png" alt="341545"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/341545.gif" alt="341545"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/368346.png" alt="368346"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/368346.gif" alt="368346"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/373275.png" alt="373275"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/373275.gif" alt="373275"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/380413.png" alt="380413"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/380413.gif" alt="380413"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/380844.png" alt="380844"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/380844.gif" alt="380844"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/382309.png" alt="382309"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/382309.gif" alt="382309"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/384966.png" alt="384966"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/384966.gif" alt="384966"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/384970.png" alt="384970"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/384970.gif" alt="384970"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/384975.png" alt="384975"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/384975.gif" alt="384975"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/384978.png" alt="384978"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/384978.gif" alt="384978"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/393451.png" alt="393451"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/393451.gif" alt="393451"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/396530.png" alt="396530"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/396530.gif" alt="396530"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/401094.png" alt="401094"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/401094.gif" alt="401094"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/401126.png" alt="401126"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/401126.gif" alt="401126"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/401177.png" alt="401177"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/401177.gif" alt="401177"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/401181.png" alt="401181"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/401181.gif" alt="401181"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/401341.png" alt="401341"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/401341.gif" alt="401341"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/401462.png" alt="401462"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/401462.gif" alt="401462"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/401641.png" alt="401641"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/401641.gif" alt="401641"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404687.png" alt="404687"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404687.gif" alt="404687"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404694.png" alt="404694"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404694.gif" alt="404694"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404717.png" alt="404717"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404717.gif" alt="404717"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404727.png" alt="404727"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404727.gif" alt="404727"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404748.png" alt="404748"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404748.gif" alt="404748"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404754.png" alt="404754"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404754.gif" alt="404754"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404807.png" alt="404807"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404807.gif" alt="404807"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404835.png" alt="404835"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404835.gif" alt="404835"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404838.png" alt="404838"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404838.gif" alt="404838"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404839.png" alt="404839"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404839.gif" alt="404839"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404842.png" alt="404842"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404842.gif" alt="404842"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404908.png" alt="404908"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404908.gif" alt="404908"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404919.png" alt="404919"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404919.gif" alt="404919"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404930.png" alt="404930"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404930.gif" alt="404930"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404933.png" alt="404933"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404933.gif" alt="404933"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404938.png" alt="404938"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404938.gif" alt="404938"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404951.png" alt="404951"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404951.gif" alt="404951"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/404966.png" alt="404966"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/404966.gif" alt="404966"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405006.png" alt="405006"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405006.gif" alt="405006"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405010.png" alt="405010"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405010.gif" alt="405010"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405013.png" alt="405013"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405013.gif" alt="405013"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405024.png" alt="405024"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405024.gif" alt="405024"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405026.png" alt="405026"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405026.gif" alt="405026"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405033.png" alt="405033"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405033.gif" alt="405033"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405142.png" alt="405142"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405142.gif" alt="405142"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405144.png" alt="405144"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405144.gif" alt="405144"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405163.png" alt="405163"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405163.gif" alt="405163"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405165.png" alt="405165"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405165.gif" alt="405165"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405177.png" alt="405177"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405177.gif" alt="405177"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405196.png" alt="405196"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405196.gif" alt="405196"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405198.png" alt="405198"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405198.gif" alt="405198"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405212.png" alt="405212"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405212.gif" alt="405212"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405226.png" alt="405226"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405226.gif" alt="405226"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405241.png" alt="405241"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405241.gif" alt="405241"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405247.png" alt="405247"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405247.gif" alt="405247"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405248.png" alt="405248"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405248.gif" alt="405248"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405255.png" alt="405255"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405255.gif" alt="405255"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405295.png" alt="405295"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405295.gif" alt="405295"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405664.png" alt="405664"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405664.gif" alt="405664"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405665.png" alt="405665"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405665.gif" alt="405665"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405754.png" alt="405754"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405754.gif" alt="405754"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405773.png" alt="405773"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405773.gif" alt="405773"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405838.png" alt="405838"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405838.gif" alt="405838"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405843.png" alt="405843"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405843.gif" alt="405843"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/405942.png" alt="405942"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/405942.gif" alt="405942"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406105.png" alt="406105"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406105.gif" alt="406105"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406151.png" alt="406151"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406151.gif" alt="406151"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406203.png" alt="406203"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406203.gif" alt="406203"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406237.png" alt="406237"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406237.gif" alt="406237"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406356.png" alt="406356"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406356.gif" alt="406356"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406446.png" alt="406446"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406446.gif" alt="406446"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406542.png" alt="406542"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406542.gif" alt="406542"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406583.png" alt="406583"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406583.gif" alt="406583"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406645.png" alt="406645"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406645.gif" alt="406645"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406658.png" alt="406658"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406658.gif" alt="406658"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406688.png" alt="406688"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406688.gif" alt="406688"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406703.png" alt="406703"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406703.gif" alt="406703"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406804.png" alt="406804"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406804.gif" alt="406804"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/406842.png" alt="406842"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/406842.gif" alt="406842"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407033.png" alt="407033"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407033.gif" alt="407033"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407144.png" alt="407144"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407144.gif" alt="407144"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407252.png" alt="407252"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407252.gif" alt="407252"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407272.png" alt="407272"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407272.gif" alt="407272"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407451.png" alt="407451"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407451.gif" alt="407451"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407475.png" alt="407475"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407475.gif" alt="407475"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407526.png" alt="407526"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407526.gif" alt="407526"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407575.png" alt="407575"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407575.gif" alt="407575"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407671.png" alt="407671"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407671.gif" alt="407671"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407699.png" alt="407699"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407699.gif" alt="407699"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/407708.png" alt="407708"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/407708.gif" alt="407708"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/408037.png" alt="408037"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/408037.gif" alt="408037"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/408116.png" alt="408116"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/408116.gif" alt="408116"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/408151.png" alt="408151"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/408151.gif" alt="408151"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/414751.png" alt="414751"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/414751.gif" alt="414751"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/414761.png" alt="414761"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/414761.gif" alt="414761"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/414765.png" alt="414765"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/414765.gif" alt="414765"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/414769.png" alt="414769"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/414769.gif" alt="414769"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/414839.png" alt="414839"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/414839.gif" alt="414839"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/416520.png" alt="416520"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/416520.gif" alt="416520"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/416525.png" alt="416525"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/416525.gif" alt="416525"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/416533.png" alt="416533"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/416533.gif" alt="416533"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/416544.png" alt="416544"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/416544.gif" alt="416544"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/417239.png" alt="417239"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/417239.gif" alt="417239"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/417274.png" alt="417274"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/417274.gif" alt="417274"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/417295.png" alt="417295"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/417295.gif" alt="417295"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/420997.png" alt="420997"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/420997.gif" alt="420997"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/421026.png" alt="421026"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/421026.gif" alt="421026"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/421042.png" alt="421042"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/421042.gif" alt="421042"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425472.png" alt="425472"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425472.gif" alt="425472"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425728.png" alt="425728"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425728.gif" alt="425728"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425731.png" alt="425731"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425731.gif" alt="425731"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425732.png" alt="425732"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425732.gif" alt="425732"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425733.png" alt="425733"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425733.gif" alt="425733"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425737.png" alt="425737"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425737.gif" alt="425737"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425742.png" alt="425742"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425742.gif" alt="425742"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425743.png" alt="425743"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425743.gif" alt="425743"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/425748.png" alt="425748"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/425748.gif" alt="425748"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/426212.png" alt="426212"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/426212.gif" alt="426212"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/426748.png" alt="426748"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/426748.gif" alt="426748"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/436292.png" alt="436292"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/436292.gif" alt="436292"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/436301.png" alt="436301"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/436301.gif" alt="436301"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/438967.png" alt="438967"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/438967.gif" alt="438967"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/444798.png" alt="444798"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/444798.gif" alt="444798"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454274.png" alt="454274"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454274.gif" alt="454274"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454277.png" alt="454277"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454277.gif" alt="454277"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454284.png" alt="454284"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454284.gif" alt="454284"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454295.png" alt="454295"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454295.gif" alt="454295"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454296.png" alt="454296"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454296.gif" alt="454296"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454308.png" alt="454308"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454308.gif" alt="454308"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454521.png" alt="454521"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454521.gif" alt="454521"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454716.png" alt="454716"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454716.gif" alt="454716"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/454728.png" alt="454728"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/454728.gif" alt="454728"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474407.png" alt="474407"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474407.gif" alt="474407"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474422.png" alt="474422"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474422.gif" alt="474422"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474426.png" alt="474426"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474426.gif" alt="474426"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474488.png" alt="474488"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474488.gif" alt="474488"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474732.png" alt="474732"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474732.gif" alt="474732"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474738.png" alt="474738"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474738.gif" alt="474738"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474775.png" alt="474775"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474775.gif" alt="474775"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474812.png" alt="474812"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474812.gif" alt="474812"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474835.png" alt="474835"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474835.gif" alt="474835"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474881.png" alt="474881"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474881.gif" alt="474881"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474882.png" alt="474882"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474882.gif" alt="474882"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474911.png" alt="474911"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474911.gif" alt="474911"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474950.png" alt="474950"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474950.gif" alt="474950"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474956.png" alt="474956"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474956.gif" alt="474956"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474979.png" alt="474979"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474979.gif" alt="474979"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474990.png" alt="474990"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474990.gif" alt="474990"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474994.png" alt="474994"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474994.gif" alt="474994"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/474999.png" alt="474999"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/474999.gif" alt="474999"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475041.png" alt="475041"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475041.gif" alt="475041"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475050.png" alt="475050"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475050.gif" alt="475050"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475181.png" alt="475181"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475181.gif" alt="475181"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475182.png" alt="475182"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475182.gif" alt="475182"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475204.png" alt="475204"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475204.gif" alt="475204"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475205.png" alt="475205"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475205.gif" alt="475205"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475216.png" alt="475216"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475216.gif" alt="475216"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475224.png" alt="475224"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475224.gif" alt="475224"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475226.png" alt="475226"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475226.gif" alt="475226"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475227.png" alt="475227"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475227.gif" alt="475227"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475234.png" alt="475234"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475234.gif" alt="475234"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475300.png" alt="475300"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475300.gif" alt="475300"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475440.png" alt="475440"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475440.gif" alt="475440"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475528.png" alt="475528"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475528.gif" alt="475528"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/475623.png" alt="475623"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/475623.gif" alt="475623"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476809.png" alt="476809"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476809.gif" alt="476809"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476814.png" alt="476814"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476814.gif" alt="476814"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476816.png" alt="476816"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476816.gif" alt="476816"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476819.png" alt="476819"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476819.gif" alt="476819"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476829.png" alt="476829"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476829.gif" alt="476829"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476839.png" alt="476839"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476839.gif" alt="476839"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476840.png" alt="476840"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476840.gif" alt="476840"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476851.png" alt="476851"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476851.gif" alt="476851"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476854.png" alt="476854"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476854.gif" alt="476854"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476884.png" alt="476884"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476884.gif" alt="476884"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476888.png" alt="476888"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476888.gif" alt="476888"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476899.png" alt="476899"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476899.gif" alt="476899"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476905.png" alt="476905"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476905.gif" alt="476905"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476906.png" alt="476906"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476906.gif" alt="476906"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/476923.png" alt="476923"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/476923.gif" alt="476923"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/486303.png" alt="486303"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/486303.gif" alt="486303"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/486340.png" alt="486340"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/486340.gif" alt="486340"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/486343.png" alt="486343"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/486343.gif" alt="486343"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/491921.png" alt="491921"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/491921.gif" alt="491921"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/491948.png" alt="491948"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/491948.gif" alt="491948"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/493770.png" alt="493770"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/493770.gif" alt="493770"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/493781.png" alt="493781"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/493781.gif" alt="493781"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/493799.png" alt="493799"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/493799.gif" alt="493799"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/493815.png" alt="493815"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/493815.gif" alt="493815"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499693.png" alt="499693"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499693.gif" alt="499693"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499697.png" alt="499697"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499697.gif" alt="499697"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499702.png" alt="499702"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499702.gif" alt="499702"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499704.png" alt="499704"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499704.gif" alt="499704"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499708.png" alt="499708"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499708.gif" alt="499708"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499711.png" alt="499711"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499711.gif" alt="499711"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499713.png" alt="499713"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499713.gif" alt="499713"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499714.png" alt="499714"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499714.gif" alt="499714"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499718.png" alt="499718"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499718.gif" alt="499718"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499720.png" alt="499720"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499720.gif" alt="499720"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499729.png" alt="499729"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499729.gif" alt="499729"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499733.png" alt="499733"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499733.gif" alt="499733"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499742.png" alt="499742"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499742.gif" alt="499742"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499844.png" alt="499844"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499844.gif" alt="499844"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499941.png" alt="499941"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499941.gif" alt="499941"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499962.png" alt="499962"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499962.gif" alt="499962"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499963.png" alt="499963"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499963.gif" alt="499963"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499968.png" alt="499968"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499968.gif" alt="499968"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/499975.png" alt="499975"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/499975.gif" alt="499975"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500045.png" alt="500045"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500045.gif" alt="500045"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500046.png" alt="500046"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500046.gif" alt="500046"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500074.png" alt="500074"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500074.gif" alt="500074"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500078.png" alt="500078"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500078.gif" alt="500078"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500091.png" alt="500091"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500091.gif" alt="500091"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500099.png" alt="500099"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500099.gif" alt="500099"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500100.png" alt="500100"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500100.gif" alt="500100"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/500116.png" alt="500116"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/500116.gif" alt="500116"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/502414.png" alt="502414"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/502414.gif" alt="502414"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/502425.png" alt="502425"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/502425.gif" alt="502425"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/502429.png" alt="502429"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/502429.gif" alt="502429"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/502437.png" alt="502437"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/502437.gif" alt="502437"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/502438.png" alt="502438"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/502438.gif" alt="502438"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/503641.png" alt="503641"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/503641.gif" alt="503641"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/503713.png" alt="503713"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/503713.gif" alt="503713"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/503789.png" alt="503789"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/503789.gif" alt="503789"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/503804.png" alt="503804"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/503804.gif" alt="503804"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/505197.png" alt="505197"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/505197.gif" alt="505197"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/505199.png" alt="505199"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/505199.gif" alt="505199"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/506696.png" alt="506696"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/506696.gif" alt="506696"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/506700.png" alt="506700"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/506700.gif" alt="506700"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/506711.png" alt="506711"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/506711.gif" alt="506711"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/506715.png" alt="506715"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/506715.gif" alt="506715"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/506719.png" alt="506719"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/506719.gif" alt="506719"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/507057.png" alt="507057"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/507057.gif" alt="507057"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/507081.png" alt="507081"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/507081.gif" alt="507081"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/507088.png" alt="507088"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/507088.gif" alt="507088"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/507093.png" alt="507093"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/507093.gif" alt="507093"/>
+          </div>
+      </div>
+      
+      <div class="captioned_video">
+          <div class="inner_gallery">
+          <img class="gallery_img over grid_r_1 grid_c_1" src="static/images/png/508387.png" alt="508387"/>
+          <img class="gallery_img under grid_r_1 grid_c_1" src="static/gifs/508387.gif" alt="508387"/>
+          </div>
+      </div>
+      
+      
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Varying the Style -->
+<section class="section">
+  <div class="container is-widescreen" id="varying">
+    <div class="link-block ">
+      <a href="#top"
+          class="nav-link button-55 is-normal">
+        <span>Go to Top</span>
+        </a>
+    </div>
+      <div class="section-title has-text-centered is-centered">
+        <h2 class="title is-3">Varying the Style</h2>
+        <br>
+      </div>
+    <div class="columns is-centered has-text-centered is-variable is-8">
+      <div class="column is-four-fifths is-centered">
+        <img id="style-image" src="static/images/method/style.jpg" />
+      </div>
+    </div>
+    <div class="section is-centered has-text-centered">
+        Our method can be applied to a wide range of styles.
+    </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <!-- <a class="icon-link"
+         href="coming soon">
+        <i class="fas fa-file-pdf"></i>
+      </a> -->
+      <!-- <a class="icon-link" href="https://github.com/yael-vinker/live_sketch" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a> -->
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            Website content is licensed under a <a rel="license"
+                                                href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
+            Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Website source code based on the <a href="https://livesketch.github.io/">LiveSketch</a> project page. If you want to reuse their <a
+              href="https://github.com/LiveSketch/livesketch.github.io">source code</a>, please credit them appropriately.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
